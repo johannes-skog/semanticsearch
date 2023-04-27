@@ -1,0 +1,36 @@
+version: '3.4'
+services:
+  weaviate:
+    container_name: weaviate
+    image: semitechnologies/weaviate:1.18.4
+    ports:
+    - 8080:8080
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      CLUSTER_HOSTNAME: 'weaviate'
+    networks:
+      - my_network
+  run:
+    container_name: ${PROJECT_NAME}
+    build:
+      context: ./dockercontext
+    ports:
+    - "8085:8085"
+    - "55069:55069"
+    - "55068:55068"
+    - "6006:6006"
+    restart: on-failure:0
+    # entrypoint: dockercontext/entrypoint.sh
+    env_file:
+      - .env
+    networks:
+      - my_network
+    volumes:
+      - .:/workspace
+networks:
+  my_network:
+    driver: bridge

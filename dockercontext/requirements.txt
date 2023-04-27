@@ -1,0 +1,15 @@
+datasets==2.11.0
+huggingface-hub==0.13.3
+jupyter==1.0.0
+matplotlib==3.7.1
+multiprocess==0.70.14
+notebook==6.5.3
+python-dotenv==1.0.0
+reacher==0.4.1
+tokenizers==0.13.2
+torch==2.0.0
+tornado==6.2
+transformers @ git+https://github.com/huggingface/transformers@fc5b7419d4c8121d8f1fa915504bcc353422559e
+openai==0.27.5
+weaviate-client==3.16.2
+tiktoken
