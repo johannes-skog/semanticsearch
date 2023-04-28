@@ -13,3 +13,5 @@ transformers @ git+https://github.com/huggingface/transformers@fc5b7419d4c8121d8
 openai==0.27.5
 weaviate-client==3.16.2
 tiktoken
+beautifulsoup4
+requests-html
