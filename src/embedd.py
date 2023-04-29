@@ -3,6 +3,7 @@ import pandas as pd
 from typing import List
 import tiktoken
 import openai
+import time
 
 def split_text(text: str, chunk_size: int, overlap: int):
     """Split a text into chunks of a given size, with a given overlap between chunks."""
@@ -93,7 +94,7 @@ class EmbedderOpenAI(Embedder):
         
         super().__init__(
             df=df,
-            embedd_column="content",
+            embedd_column=embedd_column,
             text_max_length=text_max_length,
             text_overlap=text_overlap,
             context_columns=context_columns,
@@ -125,19 +126,65 @@ class EmbedderOpenAI(Embedder):
         
         self._df["n_tokens"] = self._df[self._embedd_column].apply(
             lambda x: len(self._tokenizer.encode(self._prepare_for_embedding(x)))
-        )
+        ) 
     
-    def embedd_single(self, text):
+    def embedd_single(self, text, timeout: float = None):
         
         text = self._prepare_for_embedding(text)
+
+        result = openai.Embedding.create(input=[text], model=self._model_name)['data'][0]['embedding']
         
-        return openai.Embedding.create(input=[text], model=self._model_name)['data'][0]['embedding']
+        if timeout is not None:
+            time.sleep(timeout)
+
+        return result
     
-    def embedd(self, limit_tokens = 2000):
+    def embedd(self, limit_tokens = 2000, timeout: float = 0.1):
         
         assert all(self._df["n_tokens"] < limit_tokens)
         
         self._df[self.EMBEDDING_COLUMN] = self._df[self._embedd_column].transform(
-            lambda x: self.embedd_single(x)
+            lambda x: self.embedd_single(x, timeout=timeout)
         )
     
+class EmbedderSwedishLegislation(EmbedderOpenAI):
+
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        embedd_column: str,
+        text_max_length: int,
+        text_overlap: int,
+        model_name: str,
+        context_columns: List[str] = None,
+    ):
+        
+        super().__init__(
+            df=df,
+            embedd_column=embedd_column,
+            text_max_length=text_max_length,
+            text_overlap=text_overlap,
+            context_columns=context_columns,
+            model_name=model_name,
+        )
+        
+   
+    def _get_iter_item(self, index):
+        
+        d = self._df.loc[index]
+
+        keys = [
+            "title",
+            "content",
+            "in_effect_date",
+            "issued_date",
+            "issuer",
+            "SFS_number",
+            self.EMBEDDING_COLUMN,
+        ]
+
+        d = d.to_dict()
+
+        d = {k: d[k] for k in keys}
+        
+        return d

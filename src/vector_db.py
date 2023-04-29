@@ -1,5 +1,6 @@
 from typing import Dict, Any, List
 import weaviate
+from embedd import Embedder
 
 class VectorDatabase(object):
     
@@ -28,16 +29,73 @@ class VectorDatabaseWeaviate(VectorDatabase):
         self._client = weaviate.Client(
           url=url
         )
+
+        self._schema = schema
         
         if self.exists is False:
-            self._setup_class(schema)
+            self._setup_class(self._schema)
             
     def _setup_class(self, schema):
         
         assert schema["class"] == self._name
         
         self._client.schema.create_class(schema)
-        
+    
+    def redo(self):
+
+        try: 
+            self.delete()
+        except Exception as e:
+            print(e)
+    
+        self._setup_class(self._schema)
+
+    @property
+    def data(self):
+
+        return self._client.data_object.get(self._name)
+
+    def delete(self):
+
+        try: 
+            self._client.schema.delete_class(self._name)
+        except Exception as e:
+            print(e)
+
+    @property
+    def data_entries(self):
+        return [x["name"] for x in self._schema["properties"]]
+
+    def search(
+        self,
+        search_vector: List[float],
+        limit: int = 10,
+        return_data_entries: List[str] = None,
+        return_distance: bool = True,
+        return_vector: bool = False,
+    ):
+
+        return_data_entries = (
+            return_data_entries if return_data_entries is not None else self.data_entries
+        )
+
+        additional = ["id"]
+
+        if return_distance:
+            additional.append("distance")
+        if return_vector:
+            additional.append("vector")
+
+        results = self._client.query.get(
+            self._name, return_data_entries
+        ).with_near_vector(
+            {"vector": search_vector}
+        ).with_additional(
+            additional
+        ).with_limit(limit).do()
+
+        return results
+
     @staticmethod
     def setup_class_object_structure(
         class_name: str,
@@ -79,3 +137,16 @@ class VectorDatabaseWeaviate(VectorDatabase):
                 break
             
         return exists
+    
+    def populate(self, embedder: Embedder, batch_size: int = 10):
+
+        with self._client.batch as batch:  # Context manager manages batch flushing
+            batch.batch_size = batch_size
+            batch.dynamic=True
+            for data_obj in embedder:
+
+                vector = data_obj[Embedder.EMBEDDING_COLUMN]
+
+                del data_obj[Embedder.EMBEDDING_COLUMN]
+
+                batch.add_data_object(data_obj, self._name, vector=vector)
