@@ -30,11 +30,7 @@ make enter
 ## Swedish Legislations and Regulations segmantic Search with Chat Interface 
 
 ### 1. Scrape Swedish legislation data 
-First, you need to scrape the Swedish government's website for all laws and regulations. Use the `scan_swedish_legislation_parallel()` function to do this
-
-
-### 1. Scrape Swedish legislation data 
-First, you need to scrape the Swedish government's website for all laws and regulations. Use the scan_swedish_legislation_parallel() function to do this
+First, you need to scrape the Swedish government's website for all laws and regulations:
 
 ```python
 from scraping import scan_swedish_legislation_parallel
@@ -59,7 +55,7 @@ embedder.setup()
 
 Some legislation and regulations are too lengthy to be embedded, by using `text_max_length` the text will be split into chunks containing at most `text_max_length` characters, `text_overlap` will ensure that we have an overlap between the different text chunks. 
 
-### r. Run the embedder
+### 3. Run the embedder
 
 Now, run the embedder to process the legislation text:
 
