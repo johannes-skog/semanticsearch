@@ -4,6 +4,9 @@ from typing import List
 import tiktoken
 import openai
 import time
+import re
+from tqdm import tqdm
+
 
 def split_text(text: str, chunk_size: int, overlap: int):
     """Split a text into chunks of a given size, with a given overlap between chunks."""
@@ -82,13 +85,14 @@ class Embedder(object):
         
 class EmbedderOpenAI(Embedder):
 
+    MODEL_NAME = "text-embedding-ada-002"
+
     def __init__(
         self,
         df: pd.DataFrame,
         embedd_column: str,
         text_max_length: int,
         text_overlap: int,
-        model_name: str,
         context_columns: List[str] = None,
     ):
         
@@ -100,52 +104,63 @@ class EmbedderOpenAI(Embedder):
             context_columns=context_columns,
         )
         
-        self._model_name = model_name
-        
-        self._tokenizer = tiktoken.encoding_for_model(self._model_name)
+        self._tokenizer = tiktoken.encoding_for_model(EmbedderOpenAI.MODEL_NAME)
         
     def setup(self):
         
         self._split_process()
         
         self._add_context()
-        
-        self._number_tokens()
+
+        self._df[self._embedd_column] = self._df[self._embedd_column].transform(
+            lambda x: self._prepare_for_embedding(x)
+        )
         
         self._df = self._df.reset_index(drop=True)
-        
+
+        self._number_tokens()
+
     def _prepare_for_embedding(self, text):
         
         text = str(text)
         
-        text = text.replace("\n", " ").replace("\r", " ")
-        
+        text = text.replace("\n", " ").replace("\r", " ").replace("/", "")
+
+        text = re.sub(' +', ' ', text)
+                
         return text
     
     def _number_tokens(self):
         
-        self._df["n_tokens"] = self._df[self._embedd_column].apply(
-            lambda x: len(self._tokenizer.encode(self._prepare_for_embedding(x)))
+        self._df["n_tokens"] = self._df[self._embedd_column].transform(
+            lambda x: len(self._tokenizer.encode(x))
         ) 
     
-    def embedd_single(self, text, timeout: float = None):
-        
-        text = self._prepare_for_embedding(text)
+    @staticmethod
+    def embedd_single(text):
 
-        result = openai.Embedding.create(input=[text], model=self._model_name)['data'][0]['embedding']
-        
-        if timeout is not None:
-            time.sleep(timeout)
+        try:
+            result = openai.Embedding.create(input=[text], model=EmbedderOpenAI.MODEL_NAME)['data'][0]['embedding']
+        except Exception as e:
+            print(e)
+            result = None
 
         return result
     
     def embedd(self, limit_tokens = 2000, timeout: float = 0.1):
         
         assert all(self._df["n_tokens"] < limit_tokens)
-        
-        self._df[self.EMBEDDING_COLUMN] = self._df[self._embedd_column].transform(
-            lambda x: self.embedd_single(x, timeout=timeout)
-        )
+
+        embedding = []
+
+        for _, row in tqdm(self._df.iterrows()):
+            
+            embedding.append(self.embedd_single(row[self._embedd_column]))
+            
+            if timeout is not None:
+                time.sleep(timeout)
+
+        self._df[self.EMBEDDING_COLUMN] = embedding
     
 class EmbedderSwedishLegislation(EmbedderOpenAI):
 
@@ -167,7 +182,6 @@ class EmbedderSwedishLegislation(EmbedderOpenAI):
             context_columns=context_columns,
             model_name=model_name,
         )
-        
    
     def _get_iter_item(self, index):
         
@@ -176,8 +190,8 @@ class EmbedderSwedishLegislation(EmbedderOpenAI):
         keys = [
             "title",
             "content",
-            "in_effect_date",
-            "issued_date",
+            #"in_effect_date",
+            #"issued_date",
             "issuer",
             "SFS_number",
             self.EMBEDDING_COLUMN,

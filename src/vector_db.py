@@ -1,6 +1,8 @@
 from typing import Dict, Any, List
 import weaviate
 from embedd import Embedder
+from tqdm import tqdm
+import numpy as np
 
 class VectorDatabase(object):
     
@@ -140,13 +142,23 @@ class VectorDatabaseWeaviate(VectorDatabase):
     
     def populate(self, embedder: Embedder, batch_size: int = 10):
 
+        i = 0
+
         with self._client.batch as batch:  # Context manager manages batch flushing
             batch.batch_size = batch_size
             batch.dynamic=True
-            for data_obj in embedder:
+            for data_obj in tqdm(embedder):
+
+                i +=1
 
                 vector = data_obj[Embedder.EMBEDDING_COLUMN]
 
+                if vector is None:
+                    continue
+
                 del data_obj[Embedder.EMBEDDING_COLUMN]
 
-                batch.add_data_object(data_obj, self._name, vector=vector)
+                try:
+                    batch.add_data_object(data_obj, self._name, vector=vector)
+                except Exception as e:
+                    print(e)
