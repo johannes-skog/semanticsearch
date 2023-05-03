@@ -120,36 +120,46 @@ law_search = SwedishLegislationSearch(
 Finally, you can perform a search query using natural language:
 
 ```python
-law_search.query("När blir det inte tillåtet att köpa en ny bensinbil? Svara detaljerat", limit=5, print_debug=True)
+return_data = law_search.query("Vilket ansvar har polisen under ett krigstillstånd? Svara detaljerat", limit=25, print_debug=True)
 ```
 
 ```
 ###########CONTEXT###########
 
-....(2011:846) om miljökrav vid upphandling av bilar och vissa tjänster inom vägtransportområdet avses ett motorfordon försett med ett drivsystem som innehåller minst en icke-perifer elektrisk maskin som energiomvandlare med ett elektriskt uppladdningsbart energilagringssystem som kan laddas externt. 3 § Med alternativa drivmedel i lagen (2011:846) om miljökrav vid upphandling av bilar och vissa tjänster inom vägtransportområdet avses bland annat - el, - väte, - biodrivmedel enligt definitionen i lagen (2010:598) om hållbarhetskriterier för biodrivmedel och biobränslen, - syntetiska och paraffiniska bränslen, - metangas, och - gasol. Med alternativa drivmedel avses däremot inte - biodrivmedel som är producerade från råvaror med hög ....
+....
+....
+....
+
+Lag (1943:881) om polisens ställning under krig||varsmakten. Lag (2014:581). 3 § Har upphävts genom lag (2014:581). 4 § Har upphävts genom lag (1980:587). 5 § Regeringen meddelar närmare föreskrifter om tillämpningen av denna lag. Lag (2014:581).
+Lag (1979:1088) om gränsövervakningen i krig m.m.||ten ska bedrivas, 2. vilka polismän, särskilt förordnade passkontrollanter och tulltjänstemän som ska avdelas för verksamheten och vilka militära enheter som ska medverka i denna, 3. hur personalen ska utbildas och utrustas, 4. vilken mate
+Lag (1979:1088) om gränsövervakningen i krig m.m.||atta åtgärder. Om Försvarsmakten, Polismyndigheten eller Tullverket ska besluta om fortsatta åtgärder ska ärendet i stället överlämnas dit. Lag (2014:684). 8 § Om en skärpning av kontrollen av persontrafiken till eller från utlandet med visst 
+Förordning (1982:756) om Försvarsmaktens ingripanden vid kränkningar av Sveriges territorium under fred och neutralitet, m.m. (IKFN-förordning)||smyndigheten. Om Polismyndigheten begär det, ska personalen hållas kvar i avvaktan på vidare åtgärder. Om det är nödvändigt får Försvarsmakten tillgripa vapenmakt. Det som nu har sagts gäller inte ambulansluftfartyg. Förordning (2014:1213). 54
+
+....
+....
+....
 
 
 ###########QUERY###########
 
 Svara på frågan med hjälp av de lagar och förordningar som du har tillgång till, referera alltid till källan.
-När blir det inte tillåtet att köpa en ny bensinbil? Svara detaljerat
+Vilket ansvar har polisen under ett krigstillstånd? Svara detaljerat
 
 
 ###########RESPONSE###########
 
-Det finns ingen specifik lag eller förordning som förbjuder köp av nya bensinbilar. Dock har Sverige och EU satt upp mål för att minska utsläppen av växthusgaser och främja en övergång till mer hållbara transportalternativ. 
+Enligt Lag (1943:881) om polisens ställning under krig är en polisman skyldig att delta i rikets försvar i den omfattning regeringen föreskriver. En polisman som enligt särskilda bestämmelser ska delta i rikets försvar tillhör under krig Försvarsmakten. Polismyndigheten kan begära medverkan av Polismyndigheten om polisiär medverkan är nödvändig för att avvärja ett fientligt angrepp. 
 
-Enligt Förordning (2022:315) om miljökrav vid upphandling av bilar och vissa tjänster inom vägtransportområdet, definieras elfordon och alternativa drivmedel som el, väte, biodrivmedel, syntetiska och paraffiniska bränslen, metangas och gasol. Däremot specificeras det att biodrivmedel som är producerade från råvaror med hög risk för indirekt ändring av markanvändning inte räknas som alternativa drivmedel. 
+Enligt Kungörelse (1958:262) om tillämpning av lagen (1943:881) om polisens ställning under krig kan polismän avdelas för att fullgöra nödvändiga civila försvarsuppgifter eller medverkan allvarligt skulle äventyra den allmänna ordningen och säkerheten. När den begärda uppgiften har slutförts får Försvarsmakten inte förfoga över polismännen. 
 
-För att främja en övergång till mer hållbara transportalternativ har Sverige satt upp mål om att ha en fossiloberoende fordonsflotta senast år 2030. Enligt Förordning (2022:206) om statligt stöd till försäljningsställen för drivmedel i vissa landsbygdsområden, kan statligt stöd ges till försäljningsställen för drivmedel i vissa landsbygdsområden för att främja tillgången till alternativa drivmedel. 
+Polismyndigheten har även ansvar för gränsövervakningen i krig enligt Lag (1979:1088) om gränsövervakningen i krig m.m. Polismyndigheten, Tullverket, Försvarsmakten och Kustbevakningen ska samordna övervakningen av trafiken över rikets gränser. 
 
-Det finns också en ny Förordning (2023:132) om producentansvar för bilar som reglerar producenternas ansvar för att ta emot uttjänta bilar och se till att minst 95 procent av bilens vikt återanvänds eller återvinns. 
+Vidare kan polisen använda skjutvapen om gruppen, avdelningen eller någon annan utsätts för ett så allvarligt angrepp eller hot om angrepp att vapen måste användas omedelbart enligt Kungörelse (1969:84) om polisens användning av skjutvapen. 
 
-Sammanfattningsvis finns det ingen specifik lag eller förordning som förbjuder köp av nya bensinbilar, men det finns mål och regleringar som främjar en övergång till mer hållbara transportalternativ och minskade utsläpp av växthusgaser. 
-
-Källor:
-- Förordning (2022:206) om statligt stöd till försäljningsställen för drivmedel i vissa landsbygdsområden
-- Förordning (2022:315) om miljökrav vid upphandling av bilar och vissa tjänster inom vägtransportområdet
-- Förordning (2023:132) om producentansvar för bilar
+Referenser:
+- Lag (1943:881) om polisens ställning under krig
+- Kungörelse (1958:262) om tillämpning av lagen (1943:881) om polisens ställning under krig
+- Lag (1979:1088) om gränsövervakningen i krig m.m.
+- Kungörelse (1969:84) om polisens användning av skjutvapen
 ```
 

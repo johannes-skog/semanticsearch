@@ -53,7 +53,7 @@ class SwedishLegislationSearch(object):
         response = openai.ChatCompletion.create(
           model="gpt-3.5-turbo",
           messages=[
-              {"role": "system", "content": "Du är en expert på Svensk lag, du svarar alltid tydligt med referenser till dina källor. Referera aldrig till några externa websidor."},
+              {"role": "system", "content": "Du är en expert på Svensk lag, du svarar alltid tydligt med referenser till dina källor i texten som du har fått. Referera aldrig till några externa websidor."},
               {"role": "user", "content": context},
               {"role": "user", "content": query}
           ],

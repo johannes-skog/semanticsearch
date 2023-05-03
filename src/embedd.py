@@ -124,7 +124,7 @@ class EmbedderOpenAI(Embedder):
         
         text = str(text)
         
-        text = text.replace("\n", " ").replace("\r", " ").replace("/", "")
+        text = text.replace("\n", " ").replace("\r", " ").replace("/", "").replace('"', '').replace('\'', '')
 
         text = re.sub(' +', ' ', text)
                 
@@ -147,6 +147,58 @@ class EmbedderOpenAI(Embedder):
 
         return result
     
+    @staticmethod
+    def embedd_batch(texts):
+
+        try:
+            result = openai.Embedding.create(input=texts, model=EmbedderOpenAI.MODEL_NAME)
+            result = [r['embedding'] for r in result['data']]
+        except Exception as e:
+            print(e)
+            result = None
+
+        return result
+    
+    @staticmethod
+    def split_dataframe(df, column_name, threshold):
+        chunks = []
+        current_chunk = []
+        current_sum = 0
+
+        for _, row in df.iterrows():
+            value = row[column_name]
+            if current_sum + value <= threshold:
+                current_chunk.append(row)
+                current_sum += value
+            else:
+                chunks.append(pd.DataFrame(current_chunk))
+                current_chunk = [row]
+                current_sum = value
+
+        if current_chunk:
+            chunks.append(pd.DataFrame(current_chunk))
+
+        return chunks
+    
+    def embedd_batches(self, limit_tokens = 2000, timeout: float = 0.1):
+        
+        assert all(self._df["n_tokens"] < limit_tokens)
+
+        embedding = []
+
+        chunks = self.split_dataframe(self._df, "n_tokens", limit_tokens)
+
+        for chunk in tqdm(chunks):
+
+            results = self.embedd_batch(chunk[self._embedd_column].values.tolist())
+
+            embedding.extend(results)
+            
+            if timeout is not None:
+                time.sleep(timeout)
+
+        self._df[self.EMBEDDING_COLUMN] = embedding
+
     def embedd(self, limit_tokens = 2000, timeout: float = 0.1):
         
         assert all(self._df["n_tokens"] < limit_tokens)
@@ -170,7 +222,6 @@ class EmbedderSwedishLegislation(EmbedderOpenAI):
         embedd_column: str,
         text_max_length: int,
         text_overlap: int,
-        model_name: str,
         context_columns: List[str] = None,
     ):
         
@@ -180,7 +231,6 @@ class EmbedderSwedishLegislation(EmbedderOpenAI):
             text_max_length=text_max_length,
             text_overlap=text_overlap,
             context_columns=context_columns,
-            model_name=model_name,
         )
    
     def _get_iter_item(self, index):

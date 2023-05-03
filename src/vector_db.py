@@ -118,7 +118,15 @@ class VectorDatabaseWeaviate(VectorDatabase):
             "class": class_name,
             "vectorizer": "none", # we are providing the vectors so this field is none
             "description": description,
-            "properties": properties
+            "properties": properties,
+            "vectorIndexType": "hnsw",
+            "vectorIndexConfig": {
+                "space": "cosine",
+                "m": 128,
+                "efConstruction": 16,
+                "ef": 250,
+                "maxConnections": 32
+            }
         }
 
         return class_obj
